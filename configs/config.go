@@ -5,39 +5,41 @@ import (
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	APP      *App
-	HTTP     *Http
-	Postgres *Postgres
+	APP      App
+	HTTP     Http
+	Postgres Postgres
 }
 
 type App struct {
-	Name    string `env-required:"true" yaml:"name"    env:"APP_NAME"`
-	Version string `env-required:"true" yaml:"version" env:"APP_VERSION"`
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
 }
 
 type Http struct {
-	Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+	Port string `yaml:"port"`
 }
 
 type Postgres struct {
-	DSN             string        `env-required:"true" yaml:"database_dsn" env:"DATABASE_DSN"`
-	MaxOpenConns    int           `env-required:"true" yaml:"max_open_conns" env:"DATABASE_MAX_OPEN_CONNS"`
-	MaxIdleConns    int           `env-required:"true" yaml:"max_idle_conns" env:"DATABASE_MAX_IDLE_CONNS"`
-	ConnMaxLifetime time.Duration `env-required:"true" yaml:"conn_max_lifetime" env:"DATABASE_CONN_MAX_LIFETIME"`
+	DSN             string        `env:"POSTGRES_DSN"`
+	MaxOpenConns    int           `yaml:"max_open_conns"`
+	MaxIdleConns    int           `yaml:"max_idle_conns"`
+	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
 }
 
 func New() (*Config, error) {
 	cfg := &Config{}
-	if err := cleanenv.ReadConfig("configs/config.yaml", cfg); err != nil {
-		return nil, fmt.Errorf(".yaml: %w", err)
+	godotenv.Load()
+
+	if err := cleanenv.ReadConfig("configs/config.yml", cfg); err != nil {
+		return nil, fmt.Errorf(".yml: %w", err)
 	}
 
 	if err := cleanenv.ReadEnv(cfg); err != nil {
 		return nil, fmt.Errorf(".env: %w", err)
 	}
-
 	return cfg, nil
 }

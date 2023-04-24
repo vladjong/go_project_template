@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/go-chi/chi"
-
 	"github.com/vladjong/go_project_template/configs"
 	v1 "github.com/vladjong/go_project_template/internal/controller/http/v1"
 	"github.com/vladjong/go_project_template/internal/repository/postgres"
@@ -25,7 +24,6 @@ func main() {
 		log.Fatal("Config error: %s", err)
 	}
 	log.Info("Completed read configs")
-	fmt.Println(cfg.Postgres.DSN)
 
 	postgresDb, err := postgres_db.NewPgx(log, postgres_db.DSN(cfg.Postgres.DSN))
 	if err != nil {

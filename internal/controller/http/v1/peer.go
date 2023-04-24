@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/vladjong/go_project_template/internal/entity"
@@ -16,6 +17,7 @@ func (h *handler) AddPeer(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, err, http.StatusBadRequest)
 		return
 	}
+	fmt.Println(peer)
 
 	ctx := context.Background()
 

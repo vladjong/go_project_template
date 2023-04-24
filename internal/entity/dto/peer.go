@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type Peer struct {
 	Nickname string    `json:"nickname" db:"nickname"`

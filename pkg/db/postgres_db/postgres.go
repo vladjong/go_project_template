@@ -55,7 +55,6 @@ func NewPgx(logger logger.Interface, opts ...Option) (*PostgresDb, error) {
 	}
 
 	postgresDb.DB = db
-
 	return postgresDb, nil
 }
 

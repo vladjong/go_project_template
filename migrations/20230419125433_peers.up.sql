@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS peers
+(
+    nickname VARCHAR(25) PRIMARY KEY,
+    birthday DATE NOT NULL
+);
