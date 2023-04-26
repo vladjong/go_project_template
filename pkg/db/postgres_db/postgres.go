@@ -41,6 +41,8 @@ func NewPgx(logger logger.Interface, opts ...Option) (*PostgresDb, error) {
 		opt(postgresDb)
 	}
 
+	fmt.Println(postgresDb.cfg.DSN)
+
 	db, err := sqlx.Open("pgx", postgresDb.cfg.DSN)
 	if err != nil {
 		return nil, fmt.Errorf("open database connection: %w", err)
