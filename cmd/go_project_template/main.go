@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/go-chi/chi"
+
 	"github.com/vladjong/go_project_template/configs"
 	v1 "github.com/vladjong/go_project_template/internal/controller/http/v1"
 	"github.com/vladjong/go_project_template/internal/repository/postgres"
@@ -25,11 +26,11 @@ func main() {
 	}
 	log.Info("Completed read configs")
 
-	postgresDb, err := postgres_db.NewPgx(log, postgres_db.DSN(cfg.Postgres.DSN))
+	postgresDb, err := postgres_db.NewPgx(log, cfg.Postgres)
 	if err != nil {
 		log.Fatal("PostgresDb error: %s", err)
 	}
-	log.Info("Completed init postgresDb")
+	log.Info("Completed init poswgresDb")
 
 	defer postgresDb.Close()
 
@@ -39,7 +40,7 @@ func main() {
 
 	mux := chi.NewRouter()
 
-	handler := v1.New(mux, peerService)
+	handler := v1.New(mux, peerService, log)
 	handler.Run()
 
 	httpServer := http_server.New(mux, log, http_server.Port(cfg.HTTP.Port))

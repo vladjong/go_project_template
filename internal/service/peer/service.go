@@ -25,7 +25,7 @@ func (s *service) AddPeer(ctx context.Context, peer entity.Peer) error {
 		Birthday: peer.Birthday,
 	}
 	if err := s.repo.AddPeer(context.Background(), peerDto); err != nil {
-		return fmt.Errorf("add item: %w", err)
+		return fmt.Errorf("add peer: %w", err)
 	}
 	return nil
 }
@@ -33,7 +33,7 @@ func (s *service) AddPeer(ctx context.Context, peer entity.Peer) error {
 func (s *service) GetPeers(ctx context.Context) ([]entity.Peer, error) {
 	items, err := s.repo.GetPeers(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("get items: %w", err)
+		return nil, fmt.Errorf("get peers: %w", err)
 	}
 	return items, nil
 }

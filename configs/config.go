@@ -2,16 +2,16 @@ package configs
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
+	"github.com/vladjong/go_project_template/pkg/db/postgres_db"
 )
 
 type Config struct {
 	APP      App
 	HTTP     Http
-	Postgres Postgres
+	Postgres postgres_db.Config
 }
 
 type App struct {
@@ -23,16 +23,11 @@ type Http struct {
 	Port string `yaml:"port"`
 }
 
-type Postgres struct {
-	DSN             string        `env:"POSTGRES_DSN"`
-	MaxOpenConns    int           `yaml:"max_open_conns"`
-	MaxIdleConns    int           `yaml:"max_idle_conns"`
-	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
-}
-
 func New() (*Config, error) {
 	cfg := &Config{}
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		return nil, fmt.Errorf("godotend load: %w", err)
+	}
 
 	if err := cleanenv.ReadConfig("configs/config.yml", cfg); err != nil {
 		return nil, fmt.Errorf(".yml: %w", err)

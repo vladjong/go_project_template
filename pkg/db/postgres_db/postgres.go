@@ -6,42 +6,28 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/vladjong/go_project_template/pkg/logger"
-)
 
-const (
-	maxOpenConns    = 50
-	maxIdleConns    = 25
-	connMaxLifetime = time.Duration(30)
+	"github.com/vladjong/go_project_template/pkg/logger"
 )
 
 type PostgresDb struct {
 	DB  *sqlx.DB
-	cfg PostgresConfig
+	cfg Config
 	log logger.Interface
 }
 
-type PostgresConfig struct {
-	DSN             string
-	MaxOpenConns    int
-	MaxIdleConns    int
-	ConnMaxLifetime time.Duration
+type Config struct {
+	DSN             string        `env:"POSTGRES_DSN"`
+	MaxOpenConns    int           `yaml:"max_open_conns"`
+	MaxIdleConns    int           `yaml:"max_idle_conns"`
+	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
 }
 
-func NewPgx(logger logger.Interface, opts ...Option) (*PostgresDb, error) {
+func NewPgx(logger logger.Interface, config Config) (*PostgresDb, error) {
 	postgresDb := &PostgresDb{
-		cfg: PostgresConfig{
-			MaxOpenConns:    maxOpenConns,
-			MaxIdleConns:    maxIdleConns,
-			ConnMaxLifetime: connMaxLifetime,
-		},
+		cfg: config,
 		log: logger,
 	}
-	for _, opt := range opts {
-		opt(postgresDb)
-	}
-
-	fmt.Println(postgresDb.cfg.DSN)
 
 	db, err := sqlx.Open("pgx", postgresDb.cfg.DSN)
 	if err != nil {

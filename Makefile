@@ -32,6 +32,11 @@ migrate-down:
 	migrate -path migrations -database $(POSTGRES_DSN) down
 .PHONY: migrate-down
 
+mock:
+	mkdir ./internal/repository/repository_mocks
+	mockgen -source ./internal/repository/repository.go -package repository_mocks > ./internal/repository/repository_mocks/mocks.go
+.PHONY: mock
+
 bin:
 	GOBIN=$(LOCAL_BIN) go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/golang/mock/mockgen@latest

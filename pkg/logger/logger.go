@@ -17,7 +17,7 @@ type Interface interface {
 }
 
 type Logger struct {
-	logger *zerolog.Logger
+	Logger *zerolog.Logger
 }
 
 var _ Interface = (*Logger)(nil)
@@ -44,7 +44,7 @@ func New(level string) *Logger {
 	logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
 
 	return &Logger{
-		logger: &logger,
+		Logger: &logger,
 	}
 }
 
@@ -61,7 +61,7 @@ func (l *Logger) Warn(message string, args ...interface{}) {
 }
 
 func (l *Logger) Error(message interface{}, args ...interface{}) {
-	if l.logger.GetLevel() == zerolog.DebugLevel {
+	if l.Logger.GetLevel() == zerolog.DebugLevel {
 		l.Debug(message, args...)
 	}
 
@@ -76,9 +76,9 @@ func (l *Logger) Fatal(message interface{}, args ...interface{}) {
 
 func (l *Logger) log(message string, args ...interface{}) {
 	if len(args) == 0 {
-		l.logger.Info().Msg(message)
+		l.Logger.Info().Msg(message)
 	} else {
-		l.logger.Info().Msgf(message, args...)
+		l.Logger.Info().Msgf(message, args...)
 	}
 }
 
