@@ -1,0 +1,13 @@
+app:
+  name: 'go_project_template'
+  version: '1.0.0'
+
+http:
+  port: '8078'
+
+postgres:
+  pool_size: 50
+  pool_timeout: "30s"
+
+logger:
+  level: "info"
