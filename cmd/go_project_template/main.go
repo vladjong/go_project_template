@@ -10,7 +10,9 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/vladjong/go_project_template/configs"
+	"github.com/vladjong/go_project_template/internal/controller/grpc"
 	v1 "github.com/vladjong/go_project_template/internal/controller/http/v1"
+	"github.com/vladjong/go_project_template/internal/controller/metrics"
 	postgres_repository "github.com/vladjong/go_project_template/internal/repository/postgres"
 	"github.com/vladjong/go_project_template/internal/services"
 	"github.com/vladjong/go_project_template/pkg/db/postgres"
@@ -49,13 +51,28 @@ func main() {
 		services.InitUsers(),
 	)
 
-	mux := chi.NewRouter()
+	metricsRouter := chi.NewRouter()
+	metricsHandler := metrics.New(metricsRouter)
+	metricsHandler.Run()
+	metricsServer := http_server.New(
+		metricsRouter,
+		http_server.Port("8082"),
+	)
 
-	handler := v1.New(mux, *services)
+	grpc := grpc.New()
+
+	if err := grpc.Start(*cfg); err != nil {
+		slog.Error("Failed to start GRPC servers", err)
+	}
+	defer grpc.Stop()
+
+	grpc.InitServices(*services)
+
+	restHandler := chi.NewRouter()
+	handler := v1.New(restHandler, services)
 	handler.Run()
-
 	httpServer := http_server.New(
-		mux,
+		restHandler,
 		http_server.Port(cfg.HTTP.Port),
 		http_server.ReadTimeout(cfg.HTTP.ReadTimeout),
 		http_server.ShutdownTimeout(cfg.HTTP.ShutdownTimeout),
@@ -69,6 +86,8 @@ func main() {
 		slog.Info("Signal", "signal", s.String())
 	case err = <-httpServer.Notify():
 		slog.Error("Signal", "HTTP server notify", err)
+	case err = <-metricsServer.Notify():
+		slog.Error("Signal", "Metrics server notify", err)
 	}
 
 	if err := httpServer.Shutdown(); err != nil {

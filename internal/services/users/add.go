@@ -15,7 +15,7 @@ func (s *service) AddUser(ctx context.Context, user entity.User) error {
 	}
 
 	if err := s.repo.AddUser(ctx, userDto); err != nil {
-		return fmt.Errorf("add peer: %w", err)
+		return fmt.Errorf("add user: %w", err)
 	}
 	return nil
 }

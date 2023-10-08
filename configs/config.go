@@ -35,6 +35,14 @@ type Logger struct {
 	Level string `yaml:"level" env:"LOGGER_LEVEL" env-default:"info"`
 }
 
+type GRPC struct {
+	Port string `yaml:"port" env:"GRPC_PORT"`
+}
+
+type Metrics struct {
+	Port string `yaml:"port" env:"METRICS_PORT"`
+}
+
 func New() (*Config, error) {
 	cfg := &Config{}
 
