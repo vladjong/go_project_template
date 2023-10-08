@@ -7,20 +7,25 @@ import (
 	"github.com/vladjong/go_project_template/internal/repository"
 )
 
-type Users interface {
+type Servicer interface {
+	Userer
+	Notificationer
+}
+
+type Userer interface {
 	AddUser(ctx context.Context, user entity.User) error
 	Users(ctx context.Context) ([]entity.User, error)
 }
 
-type Notifications interface {
+type Notificationer interface {
 	Notifications(ctx context.Context) ([]entity.Notification, error)
 }
 
 type Services struct {
 	repo repository.Repository
 
-	Users
-	Notifications
+	Userer
+	Notificationer
 }
 
 func New(repo repository.Repository, opts ...Option) *Services {

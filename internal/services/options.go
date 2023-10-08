@@ -9,12 +9,12 @@ type Option func(*Services)
 
 func InitUsers() Option {
 	return func(s *Services) {
-		s.Users = users.New(s.repo)
+		s.Userer = users.New(s.repo)
 	}
 }
 
 func InitNotifications() Option {
 	return func(s *Services) {
-		s.Notifications = notifications.New(s.repo)
+		s.Notificationer = notifications.New(s.repo)
 	}
 }

@@ -10,10 +10,10 @@ import (
 
 type handler struct {
 	mux      *chi.Mux
-	services services.Services
+	services services.Servicer
 }
 
-func New(mux *chi.Mux, services services.Services) *handler {
+func New(mux *chi.Mux, services services.Servicer) *handler {
 	return &handler{
 		mux:      mux,
 		services: services,

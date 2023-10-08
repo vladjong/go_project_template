@@ -11,3 +11,9 @@ postgres:
 
 logger:
   level: "info"
+
+grpc:
+  port: "9078"
+
+metrics:
+  port: '8082'
