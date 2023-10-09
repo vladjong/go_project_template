@@ -53,6 +53,6 @@ func (s *GRPC) Stop() error {
 	return nil
 }
 
-func (s *GRPC) InitServices(service services.Services) {
+func (s *GRPC) InitServices(service services.Servicer) {
 	users_grpc.RegisterUsersServer(s.grpc, users.New(service))
 }

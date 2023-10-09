@@ -7,10 +7,10 @@ import (
 
 type Service struct {
 	users_grpc.UnimplementedUsersServer
-	service services.Services
+	service services.Servicer
 }
 
-func New(service services.Services) *Service {
+func New(service services.Servicer) *Service {
 	return &Service{
 		service: service,
 	}
