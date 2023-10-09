@@ -15,6 +15,7 @@ type Servicer interface {
 type Userer interface {
 	AddUser(ctx context.Context, user entity.User) error
 	Users(ctx context.Context) ([]entity.User, error)
+	User(ctx context.Context, id string) (entity.User, error)
 }
 
 type Notificationer interface {

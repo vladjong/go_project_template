@@ -14,6 +14,7 @@ type Repository interface {
 type Userer interface {
 	AddUser(ctx context.Context, item dto.User) error
 	Users(ctx context.Context) ([]dto.User, error)
+	User(ctx context.Context, id string) (dto.User, error)
 }
 
 type Notificationer interface {
