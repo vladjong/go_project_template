@@ -2,14 +2,26 @@ package users
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/vladjong/go_project_template/internal/entity/dto"
+	"github.com/vladjong/go_project_template/internal/repository/postgres/transaction"
 )
 
 func (r *Repository) AddUser(ctx context.Context, item dto.User) error {
-	if _, err := r.db.DB.Model(&item).Insert(); err != nil {
-		return fmt.Errorf("insert data: %w", err)
+	query, args, err := r.db.Builder.
+		Insert("users").
+		Columns("id", "nickname", "birthday").
+		Values(item.Id, item.Nickname, item.Birthday).
+		ToSql()
+	if err != nil {
+		return err
 	}
+
+	if _, err := transaction.
+		Model(ctx, r.db.Pool).
+		Exec(ctx, query, args...); err != nil {
+		return err
+	}
+
 	return nil
 }

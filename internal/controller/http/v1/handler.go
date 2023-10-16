@@ -33,5 +33,8 @@ func (h *handler) Run() {
 			r.Post("/", h.AddUser)
 			r.Get("/", h.Users)
 		})
+		r.Route("/notifications", func(r chi.Router) {
+			r.Post("/", h.CreateNotification)
+		})
 	})
 }

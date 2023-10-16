@@ -3,6 +3,8 @@ package grpc
 import (
 	"net"
 
+	"log/slog"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_xrequest_id "github.com/higebu/go-grpc-interceptor/xrequestid"
@@ -34,17 +36,19 @@ func New() *GRPC {
 			),
 		),
 	)
+	grpc := &GRPC{
+		grpc: server,
+	}
 	reflection.Register(server)
-	return nil
+	return grpc
 }
 
 func (s *GRPC) Start(cfg configs.Config) error {
-	address := ""
-
-	l, err := net.Listen("tcp", address)
+	l, err := net.Listen("tcp", cfg.GRPC.Port)
 	if err != nil {
 		return err
 	}
+	slog.Info("Listening to gRPC", "port", cfg.GRPC.Port)
 	return s.grpc.Serve(l)
 }
 

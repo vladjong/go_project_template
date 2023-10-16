@@ -12,6 +12,7 @@ type Config struct {
 	HTTP     Http
 	Postgres Postgres
 	Logger   Logger
+	GRPC     GRPC
 }
 
 type App struct {
@@ -26,9 +27,10 @@ type Http struct {
 }
 
 type Postgres struct {
-	DSN         string        `yaml:"dsn" env:"POSTGRES_DSN"`
-	PoolSize    int           `yaml:"pool_size" env:"POSTGRES_POOL_SIZE"`
-	PoolTimeout time.Duration `yaml:"pool_timeout" env:"POSTGRES_POOL_TIMEOUT"`
+	DSN            string        `yaml:"dsn" env:"POSTGRES_DSN"`
+	MaxPoolSize    int           `yaml:"max_pool_size" env:"POSTGRES_MAX_POOL_SIZE"`
+	ConnectAttemp  int           `yaml:"connect_attemp" env:"POSTGRES_CONNECT_ATTEMP"`
+	ConnectTimeout time.Duration `yaml:"connect_timeout" env:"POSTGRES_CONNECT_TIMEOUT"`
 }
 
 type Logger struct {

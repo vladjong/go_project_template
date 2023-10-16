@@ -2,59 +2,68 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
-	"github.com/go-pg/pg/v10"
+	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 const (
-	_defaultPoolSize    = 1
-	_defaultPoolTimeout = time.Second
+	_defaultMaxPoolSize  = 10
+	_defaultConnAttempts = 10
+	_defaultConnTimeout  = time.Second
 )
 
 type Postgres struct {
-	DB *pg.DB
+	Pool    *pgxpool.Pool
+	Builder squirrel.StatementBuilderType
+	Bun     *bun.DB
 
-	poolSize    int
-	poolTimeout time.Duration
+	maxPoolSize  int
+	connAttempts int
+	connTimeout  time.Duration
 }
 
 type Config struct {
 	Name string
 }
 
-func New(url string, opts ...Option) (*Postgres, error) {
-	postgres := &Postgres{
-		poolSize:    _defaultPoolSize,
-		poolTimeout: _defaultPoolTimeout,
-	}
+func New(ctx context.Context, url string, opts ...Option) (*Postgres, error) {
+	postgres := &Postgres{}
 
 	for _, opt := range opts {
 		opt(postgres)
 	}
 
-	opt, err := pg.ParseURL(url)
-	if err != nil {
-		return nil, fmt.Errorf("db parse url: %w", err)
-	}
+	postgres.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	opt.PoolSize = postgres.poolSize
-	opt.PoolTimeout = postgres.poolTimeout
+	// pool, err := pgxpool.New(ctx, url)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("postgres - NewPostgres - connAttempts == 0: %w", err)
+	// }
 
-	postgres.DB = pg.Connect(opt)
+	// postgres.Pool = pool
+	fmt.Println(url)
 
-	if err := postgres.DB.Ping(context.Background()); err != nil {
-		return nil, fmt.Errorf("db ping: %w", err)
+	postgres.Bun = bun.NewDB(sql.OpenDB(
+		pgdriver.NewConnector(
+			pgdriver.WithDSN(url))),
+		pgdialect.New())
+
+	if err := postgres.Bun.Ping(); err != nil {
+		return nil, err
 	}
 
 	return postgres, nil
 }
 
-func (p *Postgres) Close() error {
-	if err := p.DB.Close(); err != nil {
-		return fmt.Errorf("db close: %w", err)
+func (p *Postgres) Close() {
+	if p.Pool != nil {
+		p.Pool.Close()
 	}
-
-	return nil
 }

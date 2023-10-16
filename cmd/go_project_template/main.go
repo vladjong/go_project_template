@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"log/slog"
 	"os"
@@ -29,9 +30,11 @@ func main() {
 	logger.New(cfg.Logger.Level)
 
 	postgresDriver, err := postgres.New(
+		context.Background(),
 		cfg.Postgres.DSN,
-		postgres.PoolSize(cfg.Postgres.PoolSize),
-		postgres.PoolTimeout(cfg.Postgres.PoolTimeout),
+		postgres.MaxPoolSize(cfg.Postgres.MaxPoolSize),
+		postgres.ConnAttemp(cfg.Postgres.ConnectAttemp),
+		postgres.ConnTimeout(cfg.Postgres.ConnectTimeout),
 	)
 	if err != nil {
 		slog.Error("Failed to init postgres driver", err)
@@ -43,6 +46,7 @@ func main() {
 		postgresDriver,
 		postgres_repository.InitNotifications(),
 		postgres_repository.InitUsers(),
+		postgres_repository.InitTransactuions(),
 	)
 
 	services := services.New(
@@ -61,12 +65,14 @@ func main() {
 
 	grpc := grpc.New()
 
-	if err := grpc.Start(*cfg); err != nil {
-		slog.Error("Failed to start GRPC servers", err)
-	}
+	go func() {
+		if err := grpc.Start(*cfg); err != nil {
+			slog.Error("Failed to start GRPC servers", err)
+			return
+		}
+	}()
 	defer grpc.Stop()
-
-	grpc.InitServices(*services)
+	grpc.InitServices(services)
 
 	restHandler := chi.NewRouter()
 	handler := v1.New(restHandler, services)

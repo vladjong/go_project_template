@@ -4,14 +4,20 @@ import "time"
 
 type Option func(*Postgres)
 
-func PoolSize(size int) Option {
+func MaxPoolSize(size int) Option {
 	return func(p *Postgres) {
-		p.poolSize = size
+		p.maxPoolSize = size
 	}
 }
 
-func PoolTimeout(timeout time.Duration) Option {
+func ConnTimeout(timeout time.Duration) Option {
 	return func(c *Postgres) {
-		c.poolTimeout = timeout
+		c.connTimeout = timeout
+	}
+}
+
+func ConnAttemp(attemp int) Option {
+	return func(c *Postgres) {
+		c.connAttempts = attemp
 	}
 }

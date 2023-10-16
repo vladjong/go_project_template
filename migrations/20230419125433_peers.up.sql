@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    nickname VARCHAR(25) PRIMARY KEY,
+    id UUID         NOT NULL PRIMARY KEY,
+    nickname VARCHAR(25),
     birthday DATE NOT NULL
 );

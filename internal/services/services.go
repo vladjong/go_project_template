@@ -20,6 +20,7 @@ type Userer interface {
 
 type Notificationer interface {
 	Notifications(ctx context.Context) ([]entity.Notification, error)
+	CreateNotification(ctx context.Context, notification entity.Notification) (entity.Notification, error)
 }
 
 type Services struct {

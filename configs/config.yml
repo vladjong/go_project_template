@@ -6,14 +6,15 @@ http:
   port: '8078'
 
 postgres:
-  pool_size: 50
-  pool_timeout: "30s"
+  max_pool_size: 1
+  connect_timeout: "1s"
+  connect_attemp: 1
 
 logger:
   level: "info"
 
 grpc:
-  port: "9078"
+  port: ":9078"
 
 metrics:
   port: '8082'

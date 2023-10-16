@@ -5,6 +5,7 @@ import (
 )
 
 type User struct {
-	Nickname string    `pq:"nickname"`
-	Birthday time.Time `pq:"birthday"`
+	Id       string    `db:"id"`
+	Nickname string    `db:"nickname"`
+	Birthday time.Time `db:"birthday"`
 }

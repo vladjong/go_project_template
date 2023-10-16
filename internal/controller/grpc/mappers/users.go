@@ -6,5 +6,10 @@ import (
 )
 
 func UserToUserGRPC(in entity.User) *users_grpc.User {
-	return &users_grpc.User{}
+	return &users_grpc.User{
+		Info: &users_grpc.UserInfo{
+			Nikname: in.Nickname,
+			// Birthday: imin.Birthday,
+		},
+	}
 }

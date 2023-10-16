@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	Userer
 	Notificationer
+	Transactioner
 }
 
 type Userer interface {
@@ -18,5 +19,10 @@ type Userer interface {
 }
 
 type Notificationer interface {
+	CreateNotification(ctx context.Context, notification dto.Notification) (dto.Notification, error)
 	Notifications(ctx context.Context) ([]dto.Notification, error)
+}
+
+type Transactioner interface {
+	WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error
 }
