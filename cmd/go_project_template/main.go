@@ -8,16 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-chi/chi"
-
 	"github.com/vladjong/go_project_template/configs"
 	"github.com/vladjong/go_project_template/internal/controller/grpc"
-	v1 "github.com/vladjong/go_project_template/internal/controller/http/v1"
-	"github.com/vladjong/go_project_template/internal/controller/metrics"
-	postgres_repository "github.com/vladjong/go_project_template/internal/repository/postgres"
-	"github.com/vladjong/go_project_template/internal/services"
+	user_repo "github.com/vladjong/go_project_template/internal/repository/postgres/user"
+	user_serv "github.com/vladjong/go_project_template/internal/service/user"
 	"github.com/vladjong/go_project_template/pkg/db/postgres"
-	"github.com/vladjong/go_project_template/pkg/http_server"
+	"github.com/vladjong/go_project_template/pkg/grpc_server"
 	"github.com/vladjong/go_project_template/pkg/logger"
 )
 
@@ -42,47 +38,12 @@ func main() {
 	}
 	defer postgresDriver.Close()
 
-	repository := postgres_repository.New(
-		postgresDriver,
-		postgres_repository.InitNotifications(),
-		postgres_repository.InitUsers(),
-		postgres_repository.InitTransactuions(),
-	)
+	userRepo := user_repo.New(postgresDriver)
+	userServ := user_serv.New(userRepo)
 
-	services := services.New(
-		repository,
-		services.InitNotifications(),
-		services.InitUsers(),
-	)
+	grpcServer := grpc_server.New(grpc_server.Port(cfg.GRPC.Port))
 
-	metricsRouter := chi.NewRouter()
-	metricsHandler := metrics.New(metricsRouter)
-	metricsHandler.Run()
-	metricsServer := http_server.New(
-		metricsRouter,
-		http_server.Port("8082"),
-	)
-
-	grpc := grpc.New()
-
-	go func() {
-		if err := grpc.Start(*cfg); err != nil {
-			slog.Error("Failed to start GRPC servers", err)
-			return
-		}
-	}()
-	defer grpc.Stop()
-	grpc.InitServices(services)
-
-	restHandler := chi.NewRouter()
-	handler := v1.New(restHandler, services)
-	handler.Run()
-	httpServer := http_server.New(
-		restHandler,
-		http_server.Port(cfg.HTTP.Port),
-		http_server.ReadTimeout(cfg.HTTP.ReadTimeout),
-		http_server.ShutdownTimeout(cfg.HTTP.ShutdownTimeout),
-	)
+  grpc.RegisterServices(grpcServer.Server(), userServ)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -90,13 +51,7 @@ func main() {
 	select {
 	case s := <-interrupt:
 		slog.Info("Signal", "signal", s.String())
-	case err = <-httpServer.Notify():
-		slog.Error("Signal", "HTTP server notify", err)
-	case err = <-metricsServer.Notify():
-		slog.Error("Signal", "Metrics server notify", err)
-	}
-
-	if err := httpServer.Shutdown(); err != nil {
-		slog.Error("Signal", "HTTP server shutdown", err)
+  case err = <-grpcServer.Notify():
+		slog.Error("Signal", "GRPC server notify", err)
 	}
 }
