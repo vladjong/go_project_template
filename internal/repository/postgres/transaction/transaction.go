@@ -10,7 +10,11 @@ import (
 )
 
 type QueryExecutor interface {
-	Exec(ctx context.Context, sql string, arguments ...any) (commandTag pgconn.CommandTag, err error)
+	Exec(
+		ctx context.Context,
+		sql string,
+		arguments ...any,
+	) (commandTag pgconn.CommandTag, err error)
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
@@ -36,7 +40,10 @@ func extractTx(ctx context.Context) pgx.Tx {
 	return nil
 }
 
-func (r *Repository) WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error {
+func (r *Repository) WithinTransaction(
+	ctx context.Context,
+	tFunc func(ctx context.Context) error,
+) error {
 	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)

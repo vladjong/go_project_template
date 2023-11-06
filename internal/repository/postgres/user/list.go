@@ -20,18 +20,18 @@ func (r *Repository) List(ctx context.Context) ([]entity.User, error) {
 	result := []entity.User{}
 
 	rows, err := transaction.Model(ctx, r.db.Pool).Query(ctx, query)
-  if err != nil {
-    return nil, err
-  }
+	if err != nil {
+		return nil, err
+	}
 
-  for rows.Next() {
-    user := entity.User{}
-    if err := rows.Scan(&user.ID, &user.Nickname, &user.Age, &user.CreatedAt, &user.UpdatedAt); err != nil {
-      return nil, err
-    }
+	for rows.Next() {
+		user := entity.User{}
+		if err := rows.Scan(&user.ID, &user.Nickname, &user.Age, &user.CreatedAt, &user.UpdatedAt); err != nil {
+			return nil, err
+		}
 
-    result = append(result, user)
-  }
+		result = append(result, user)
+	}
 
 	return result, nil
 }

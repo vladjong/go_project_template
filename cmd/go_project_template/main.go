@@ -43,7 +43,7 @@ func main() {
 
 	grpcServer := grpc_server.New(grpc_server.Port(cfg.GRPC.Port))
 
-  grpc.RegisterServices(grpcServer.Server(), userServ)
+	grpc.RegisterServices(grpcServer.Server(), userServ)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -51,7 +51,7 @@ func main() {
 	select {
 	case s := <-interrupt:
 		slog.Info("Signal", "signal", s.String())
-  case err = <-grpcServer.Notify():
+	case err = <-grpcServer.Notify():
 		slog.Error("Signal", "GRPC server notify", err)
 	}
 }

@@ -10,11 +10,11 @@ import (
 
 func (s *Service) List(ctx context.Context, req *emptypb.Empty) (*user_grpc.ListResponse, error) {
 	result, err := s.userService.List(ctx)
-  if err != nil {
-    return nil, err
-  }
+	if err != nil {
+		return nil, err
+	}
 
 	return &user_grpc.ListResponse{
-    Users: UsersToUsersGRPC(result),
-  }, nil
+		Users: UsersToUsersGRPC(result),
+	}, nil
 }

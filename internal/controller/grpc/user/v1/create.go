@@ -28,16 +28,16 @@ func (s *Service) Create(
 	}
 
 	validate := validator.New()
-  if err := validate.Struct(user); err != nil {
-    return nil, status.Error(codes.InvalidArgument, err.Error())
-  }
+	if err := validate.Struct(user); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 
-  result, err := s.userService.Create(ctx, user)
-  if err != nil {
-    return nil, err
-  }
-  
+	result, err := s.userService.Create(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
 	return &user_grpc.CreateResponse{
-    User: UserToUserGRPC(result),
-  }, nil
+		User: UserToUserGRPC(result),
+	}, nil
 }

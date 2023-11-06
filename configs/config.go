@@ -16,20 +16,20 @@ type Config struct {
 }
 
 type App struct {
-	Name    string `yaml:"name" env:"APP_NAME"`
+	Name    string `yaml:"name"    env:"APP_NAME"`
 	Version string `yaml:"version" env:"APP_VERSION"`
 }
 
 type Http struct {
-	Port            string        `yaml:"port" env:"HTTP_PORT"`
-	ReadTimeout     time.Duration `yaml:"read_timeout" env:"HTTP_READ_TIMEOUT"`
+	Port            string        `yaml:"port"             env:"HTTP_PORT"`
+	ReadTimeout     time.Duration `yaml:"read_timeout"     env:"HTTP_READ_TIMEOUT"`
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env:"HTTP_SHUTDOWN_TIMEOUT"`
 }
 
 type Postgres struct {
-	DSN            string        `yaml:"dsn" env:"POSTGRES_DSN"`
-	MaxPoolSize    int           `yaml:"max_pool_size" env:"POSTGRES_MAX_POOL_SIZE"`
-	ConnectAttemp  int           `yaml:"connect_attemp" env:"POSTGRES_CONNECT_ATTEMP"`
+	DSN            string        `yaml:"dsn"             env:"POSTGRES_DSN"`
+	MaxPoolSize    int           `yaml:"max_pool_size"   env:"POSTGRES_MAX_POOL_SIZE"`
+	ConnectAttemp  int           `yaml:"connect_attemp"  env:"POSTGRES_CONNECT_ATTEMP"`
 	ConnectTimeout time.Duration `yaml:"connect_timeout" env:"POSTGRES_CONNECT_TIMEOUT"`
 }
 

@@ -1,6 +1,8 @@
 package postgres
 
-import "time"
+import (
+	"time"
+)
 
 type Option func(*Postgres)
 
