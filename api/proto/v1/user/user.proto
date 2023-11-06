@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package go_project_template.user.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/vladjong/go-project-template/pkg/go-project-template/v1/user;user";
+
+message UserInfo {
+    string nikname = 1;
+    uint32 age = 2;
+}
+
+message User {
+    string id = 1;
+    UserInfo info = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+}

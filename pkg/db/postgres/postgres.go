@@ -5,56 +5,50 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-pg/pg/v10"
+	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const (
-	_defaultPoolSize    = 1
-	_defaultPoolTimeout = time.Second
+var (
+	_defaultMaxPoolSize  = 10
+	_defaultConnAttempts = 10
+	_defaultConnTimeout  = time.Second
 )
 
 type Postgres struct {
-	DB *pg.DB
+	Pool    *pgxpool.Pool
+	Builder squirrel.StatementBuilderType
 
-	poolSize    int
-	poolTimeout time.Duration
+	maxPoolSize  int
+	connAttempts int
+	connTimeout  time.Duration
 }
 
 type Config struct {
 	Name string
 }
 
-func New(url string, opts ...Option) (*Postgres, error) {
-	postgres := &Postgres{
-		poolSize:    _defaultPoolSize,
-		poolTimeout: _defaultPoolTimeout,
-	}
+func New(ctx context.Context, url string, opts ...Option) (*Postgres, error) {
+	postgres := &Postgres{}
 
 	for _, opt := range opts {
 		opt(postgres)
 	}
 
-	opt, err := pg.ParseURL(url)
+	postgres.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	pool, err := pgxpool.New(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("db parse url: %w", err)
+		return nil, fmt.Errorf("postgres - NewPostgres - connAttempts == 0: %w", err)
 	}
 
-	opt.PoolSize = postgres.poolSize
-	opt.PoolTimeout = postgres.poolTimeout
-
-	postgres.DB = pg.Connect(opt)
-
-	if err := postgres.DB.Ping(context.Background()); err != nil {
-		return nil, fmt.Errorf("db ping: %w", err)
-	}
+	postgres.Pool = pool
 
 	return postgres, nil
 }
 
-func (p *Postgres) Close() error {
-	if err := p.DB.Close(); err != nil {
-		return fmt.Errorf("db close: %w", err)
+func (p *Postgres) Close() {
+	if p.Pool != nil {
+		p.Pool.Close()
 	}
-
-	return nil
 }

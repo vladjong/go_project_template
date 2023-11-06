@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+    rabbitmq3:
+        container_name: "rabbitmq"
+        image: rabbitmq:3.12-management
+        environment:
+            - RABBITMQ_DEFAULT_USER=rabbit
+            - RABBITMQ_DEFAULT_PASS=mypassword
+        ports:
+            # AMQP protocol port
+            - '5672:5672'
+            # HTTP management UI
+            - '15672:15672'
+    cache:
+        container_name: "cache"
+        image: redis:6.2-alpine
+        restart: always
+        ports:
+          - '6379:6379'
+        command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+        volumes: 
+          - cache:/data
+volumes:
+  cache:
+    driver: local

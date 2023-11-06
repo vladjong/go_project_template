@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	_Error = "error"
-	_Debug = "debug"
-	_Warn  = "warn"
-	_Info  = "info"
+	_error = "error"
+	_debug = "debug"
+	_warn  = "warn"
+	_info  = "info"
 )
 
 func New(level string) {
@@ -21,11 +21,11 @@ func New(level string) {
 
 func mappLevel(level string) slog.Level {
 	switch level {
-	case _Error:
+	case _error:
 		return slog.LevelError
-	case _Debug:
+	case _debug:
 		return slog.LevelDebug
-	case _Warn:
+	case _warn:
 		return slog.LevelWarn
 	default:
 		return slog.LevelInfo

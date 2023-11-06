@@ -1,58 +1,22 @@
 package grpc
 
 import (
-	"net"
+	"context"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpc_xrequest_id "github.com/higebu/go-grpc-interceptor/xrequestid"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 
-	"github.com/vladjong/go_project_template/configs"
-	"github.com/vladjong/go_project_template/internal/controller/grpc/users"
-	"github.com/vladjong/go_project_template/internal/services"
-	users_grpc "github.com/vladjong/go_project_template/pkg/go-project-template/proto/v1/users"
+	v1 "github.com/vladjong/go_project_template/internal/controller/grpc/user/v1"
+	"github.com/vladjong/go_project_template/internal/entity"
+	user_grpc "github.com/vladjong/go_project_template/pkg/go-project-template/proto/v1/user"
 )
 
-type GRPC struct {
-	grpc *grpc.Server
+type UserServicer interface {
+	Create(ctx context.Context, user entity.UserInfo) (entity.User, error)
+	List(ctx context.Context) ([]entity.User, error)
+	User(ctx context.Context, id uuid.UUID) (entity.User, error)
 }
 
-func New() *GRPC {
-	server := grpc.NewServer(
-		grpc.StreamInterceptor(
-			grpc_middleware.ChainStreamServer(
-				grpc_recovery.StreamServerInterceptor(),
-				grpc_xrequest_id.StreamServerInterceptor(),
-			),
-		),
-		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
-				grpc_recovery.UnaryServerInterceptor(),
-				grpc_xrequest_id.UnaryServerInterceptor(),
-			),
-		),
-	)
-	reflection.Register(server)
-	return nil
-}
-
-func (s *GRPC) Start(cfg configs.Config) error {
-	address := ""
-
-	l, err := net.Listen("tcp", address)
-	if err != nil {
-		return err
-	}
-	return s.grpc.Serve(l)
-}
-
-func (s *GRPC) Stop() error {
-	s.grpc.GracefulStop()
-	return nil
-}
-
-func (s *GRPC) InitServices(service services.Servicer) {
-	users_grpc.RegisterUsersServer(s.grpc, users.New(service))
+func RegisterServices(server *grpc.Server, userService UserServicer) {
+	user_grpc.RegisterUserServiceServer(server, v1.New(userService))
 }

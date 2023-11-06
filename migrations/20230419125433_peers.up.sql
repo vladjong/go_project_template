@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS users
-(
-    nickname VARCHAR(25) PRIMARY KEY,
-    birthday DATE NOT NULL
-);
